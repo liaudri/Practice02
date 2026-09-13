@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק המכולת - לומדים Flexbox</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- אזור השליטה וההוראות -->
+        <aside class="sidebar">
+            <h1>🛒 מכולת Flexbox</h1>
+            <h2 id="level-indicator">שלב 1 מתוך 6</h2>
+            <p id="instruction" class="instruction">הוראות יופיעו כאן...</p>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="flex-direction">flex-direction:</label>
+                    <select id="flex-direction" class="flex-select">
+                        <option value="row">row</option>
+                        <option value="row-reverse">row-reverse</option>
+                        <option value="column">column</option>
+                        <option value="column-reverse">column-reverse</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="justify-content">justify-content:</label>
+                    <select id="justify-content" class="flex-select">
+                        <option value="flex-start">flex-start</option>
+                        <option value="flex-end">flex-end</option>
+                        <option value="center">center</option>
+                        <option value="space-between">space-between</option>
+                        <option value="space-around">space-around</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="align-items">align-items:</label>
+                    <select id="align-items" class="flex-select">
+                        <option value="flex-start">flex-start</option>
+                        <option value="flex-end">flex-end</option>
+                        <option value="center">center</option>
+                        <option value="stretch">stretch</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="flex-wrap">flex-wrap:</label>
+                    <select id="flex-wrap" class="flex-select">
+                        <option value="nowrap">nowrap</option>
+                        <option value="wrap">wrap</option>
+                        <option value="wrap-reverse">wrap-reverse</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="check-btn" class="btn primary">בדוק פתרון</button>
+                <button id="reset-btn" class="btn secondary">אפס שלב</button>
+            </div>
+            
+            <div id="feedback-message" class="message hidden"></div>
+        </aside>
+
+        <!-- אזור לוח המשחק -->
+        <main class="board-area">
+            <!-- הלוח מוגדר כ-LTR כדי שההתנהגות של Flexbox תהיה סטנדרטית כמו באנגלית -->
+            <div class="board-wrapper">
+                <div id="board" class="board" dir="ltr">
+                    <!-- הפריטים יוכנסו לכאן דינמית באמצעות JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
