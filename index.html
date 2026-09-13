@@ -1,80 +1,53 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק המכולת - לומדים Flexbox</title>
+    <title>סדרן המכולת - משחק Flexbox</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="game-container">
-        <!-- אזור השליטה וההוראות -->
-        <aside class="sidebar">
-            <h1>🛒 מכולת Flexbox</h1>
-            <h2 id="level-indicator">שלב 1 מתוך 6</h2>
-            <p id="instruction" class="instruction">הוראות יופיעו כאן...</p>
-            
-            <div class="controls">
-                <div class="control-group">
-                    <label for="flex-direction">flex-direction:</label>
-                    <select id="flex-direction" class="flex-select">
-                        <option value="row">row</option>
-                        <option value="row-reverse">row-reverse</option>
-                        <option value="column">column</option>
-                        <option value="column-reverse">column-reverse</option>
-                    </select>
-                </div>
 
-                <div class="control-group">
-                    <label for="justify-content">justify-content:</label>
-                    <select id="justify-content" class="flex-select">
-                        <option value="flex-start">flex-start</option>
-                        <option value="flex-end">flex-end</option>
-                        <option value="center">center</option>
-                        <option value="space-between">space-between</option>
-                        <option value="space-around">space-around</option>
-                    </select>
-                </div>
+    <!-- Top Bar: Score, progress, and stage navigation -->
+    <header class="header-bar">
+        <div class="stats-container">
+            <span id="stage-counter">שלב 1 מתוך 6</span> |
+            <span>ניקוד: <strong id="score-display">0</strong></span> |
+            <span>ניסיונות: <strong id="attempts-count">0</strong></span>
+        </div>
+        <div class="stage-nav" id="stage-nav"></div>
+    </header>
 
-                <div class="control-group">
-                    <label for="align-items">align-items:</label>
-                    <select id="align-items" class="flex-select">
-                        <option value="flex-start">flex-start</option>
-                        <option value="flex-end">flex-end</option>
-                        <option value="center">center</option>
-                        <option value="stretch">stretch</option>
-                    </select>
-                </div>
+    <!-- Main game wrapper -->
+    <main class="game-container">
 
-                <div class="control-group">
-                    <label for="flex-wrap">flex-wrap:</label>
-                    <select id="flex-wrap" class="flex-select">
-                        <option value="nowrap">nowrap</option>
-                        <option value="wrap">wrap</option>
-                        <option value="wrap-reverse">wrap-reverse</option>
-                    </select>
-                </div>
+        <!-- Control panel and instructions -->
+        <section class="controls-panel">
+            <h2 id="stage-title">טוען שלב...</h2>
+            <p id="stage-instruction">הוראות השלב יופיעו כאן.</p>
+
+            <div id="dynamic-controls" class="controls-list">
+                <!-- Select dropdowns will load dynamically here -->
             </div>
 
-            <div class="actions">
-                <button id="check-btn" class="btn primary">בדוק פתרון</button>
-                <button id="reset-btn" class="btn secondary">אפס שלב</button>
+            <div class="btn-group">
+                <button class="btn-check" onclick="checkSolution()">בדוק פתרון ✔️</button>
+                <button class="btn-reset" onclick="resetCurrentStage()">איפוס 🔄</button>
             </div>
-            
-            <div id="feedback-message" class="message hidden"></div>
-        </aside>
+        </section>
 
-        <!-- אזור לוח המשחק -->
-        <main class="board-area">
-            <!-- הלוח מוגדר כ-LTR כדי שההתנהגות של Flexbox תהיה סטנדרטית כמו באנגלית -->
-            <div class="board-wrapper">
-                <div id="board" class="board" dir="ltr">
-                    <!-- הפריטים יוכנסו לכאן דינמית באמצעות JS -->
-                </div>
+        <!-- Grocery shelf board -->
+        <section class="board-wrapper">
+            <div class="shelf-board" id="shelf-board">
+                <!-- Products will load dynamically here -->
             </div>
-        </main>
-    </div>
+        </section>
 
-    <script src="script.js"></script>
+    </main>
+
+    <script src="app.js"></script>
 </body>
+
 </html>
