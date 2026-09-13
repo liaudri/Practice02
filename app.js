@@ -30,7 +30,7 @@ const gameLevels = [
     {
         id: 4,
         title: "שלב 4: צנצנות דבש (משולב #2)",
-        instruction: "סדרו את הצנצנות מימין לשמאל (סדר הפוך) והצמידו אותן לתחתית המדף.",
+        instruction: "סדרו את הצנצנות בסדר הפוך, והצמידו אותן לתחתית המדף.",
         items: ["🏺1", "🏺2", "🏺3"],
         controls: ["flexDirection", "alignItems"],
         solution: { flexDirection: "row-reverse", alignItems: "flex-end" },
