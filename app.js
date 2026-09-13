@@ -20,8 +20,8 @@ const gameLevels = [
     },
     {
         id: 3,
-        title: "שלב 3: חטיפי צ'יפס (משולב #1)",
-        instruction: "סדרו את חטיפי הצ'יפס בטור מלמעלה למטה, ומקדו אותם לרוחב המדף במרכז.",
+        title: "שלב 3:  קופסאות פופקורן",
+        instruction: "סדרו את קופסאות הפופקורן בטור מלמעלה למטה, ומקדו אותם לרוחב המדף במרכז.",
         items: ["🍿", "🍿", "🍿"],
         controls: ["flexDirection", "alignItems"],
         solution: { flexDirection: "column", alignItems: "center" },
@@ -29,16 +29,16 @@ const gameLevels = [
     },
     {
         id: 4,
-        title: "שלב 4: צנצנות דבש (משולב #2)",
-        instruction: "סדרו את הצנצנות בסדר הפוך, והצמידו אותן לתחתית המדף.",
-        items: ["🏺1", "🏺2", "🏺3"],
+        title: "שלב 4: צנצנות דבש",
+        instruction: "סדרו את הצנצנות מימין לשמאל בסדר הפוך והצמידו אותן לתחתית המדף.",
+        items: ["🍯3", "🍯2", "🍯1"],
         controls: ["flexDirection", "alignItems"],
         solution: { flexDirection: "row-reverse", alignItems: "flex-end" },
         defaultValues: { flexDirection: "row", alignItems: "flex-start" }
     },
     {
         id: 5,
-        title: "שלב 5: חפיסות שוקולד (משולב #3)",
+        title: "שלב 5: חפיסות שוקולד",
         instruction: "סדרו את חפיסות השוקולד בטור אנכי, ומקדו אותן במרכז הגובה של המדף.",
         items: ["🍫", "🍫", "🍫"],
         controls: ["flexDirection", "justifyContent"],
@@ -47,9 +47,9 @@ const gameLevels = [
     },
     {
         id: 6,
-        title: "שלב 6: עומס קרטוני חלב (משולב #4 + Wrap)",
+        title: "שלב 6: עומס קרטוני מיץ",
         instruction: "הגיע משלוח גדול! אפשרו למוצרים לגלוש לשורות נוספות (wrap) ומקדו אותם במרכז המדף לרוחבו ולאורכו.",
-        items: ["🥛", "🥛", "🥛", "🥛", "🥛"],
+        items: ["🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃"],
         controls: ["flexWrap", "justifyContent", "alignItems"],
         solution: { flexWrap: "wrap", justifyContent: "center", alignItems: "center" },
         defaultValues: { flexWrap: "nowrap", justifyContent: "flex-start", alignItems: "flex-start" }
