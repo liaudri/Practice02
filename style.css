@@ -117,7 +117,8 @@ body {
 /* Control Panel */
 .clipboard-panel {
   flex: 1;
-  min-width: 320px;
+  min-width: 280px;
+  width: 100%;
   background: var(--card-bg);
   border: var(--border-thick);
   box-shadow: var(--shadow-hard-lg);
@@ -292,6 +293,8 @@ select:focus {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 504px;
 }
 
 .shelf-frame {
@@ -300,10 +303,12 @@ select:focus {
   border: var(--border-thick);
   border-radius: 16px;
   box-shadow: var(--shadow-hard-lg);
+  width: 100%;
 }
 
 #pond {
-  width: 480px;
+  width: 100%;
+  max-width: 480px;
   height: 340px;
   background-color: #bae6fd;
   background-image: repeating-linear-gradient(45deg, #bae6fd 0, #bae6fd 10px, #7dd3fc 10px, #7dd3fc 20px);
@@ -326,7 +331,40 @@ select:focus {
   margin: 6px;
   box-shadow: 3px 3px 0px var(--ink-color);
   user-select: none;
-  direction: ltr; /* מונע בעיות Bidi/Unicode במספרים ואימוג'ים */
+  direction: ltr;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 520px) {
+  body {
+    padding: 16px 10px;
+  }
+
+  .receipt-header {
+    padding: 12px;
+  }
+
+  .clipboard-panel {
+    padding: 20px 14px 14px 14px;
+  }
+
+  .shelf-frame {
+    padding: 8px;
+  }
+
+  #pond {
+    height: 270px;
+  }
+
+  .shelf-item {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+    margin: 3px;
+    border-width: 2px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 0px var(--ink-color);
+  }
 }
 
 /* Animations */
