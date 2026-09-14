@@ -1,5 +1,4 @@
-// Define 6 game levels according to project requirements
-const gameLevels = [
+const STAGES_CONFIG = [
     {
         id: 1,
         title: "שלב 1: קופסאות שימורים",
@@ -20,8 +19,8 @@ const gameLevels = [
     },
     {
         id: 3,
-        title: "שלב 3:  קופסאות פופקורן",
-        instruction: "סדרו את קופסאות הפופקורן בטור מלמעלה למטה, ומקדו אותם לרוחב המדף במרכז.",
+        title: "שלב 3: קופסאות פופקורן",
+        instruction: "סדרו את הפופקורן בטור מלמעלה למטה, ומקדו אותם לרוחב המדף במרכז.",
         items: ["🍿", "🍿", "🍿"],
         controls: ["flexDirection", "alignItems"],
         solution: { flexDirection: "column", alignItems: "center" },
@@ -30,8 +29,8 @@ const gameLevels = [
     {
         id: 4,
         title: "שלב 4: צנצנות דבש",
-        instruction: "סדרו את הצנצנות מימין לשמאל בסדר הפוך והצמידו אותן לתחתית המדף.",
-        items: ["🍯3", "🍯2", "🍯1"],
+        instruction: "סדרו את הצנצנות בסדר הפוך מימין לשמאל והצמידו אותן לתחתית המדף.",
+        items: ["🍯 3", "🍯 2", "🍯 1"],
         controls: ["flexDirection", "alignItems"],
         solution: { flexDirection: "row-reverse", alignItems: "flex-end" },
         defaultValues: { flexDirection: "row", alignItems: "flex-start" }
@@ -39,7 +38,7 @@ const gameLevels = [
     {
         id: 5,
         title: "שלב 5: חפיסות שוקולד",
-        instruction: "סדרו את חפיסות השוקולד בטור אנכי, ומקדו אותן במרכז הגובה של המדף.",
+        instruction: "סדרו את השוקולד בטור אנכי, ומקדו אותו במרכז הגובה של המדף.",
         items: ["🍫", "🍫", "🍫"],
         controls: ["flexDirection", "justifyContent"],
         solution: { flexDirection: "column", justifyContent: "center" },
@@ -48,7 +47,7 @@ const gameLevels = [
     {
         id: 6,
         title: "שלב 6: עומס קרטוני מיץ",
-        instruction: "הגיע משלוח גדול! אפשרו למוצרים לגלוש לשורות נוספות (wrap) ומקדו אותם במרכז המדף לרוחבו ולאורכו.",
+        instruction: "משלוח ענקי! איפשרו למוצרים לגלוש לשורות נוספות (wrap) ומקדו אותם במרכז המדף.",
         items: ["🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃", "🧃"],
         controls: ["flexWrap", "justifyContent", "alignItems"],
         solution: { flexWrap: "wrap", justifyContent: "center", alignItems: "center" },
@@ -56,183 +55,191 @@ const gameLevels = [
     }
 ];
 
-// Options for each Select dropdown
-const selectOptions = {
+const FLEX_OPTIONS = {
     justifyContent: ["flex-start", "flex-end", "center", "space-between", "space-around", "space-evenly"],
     alignItems: ["flex-start", "flex-end", "center", "stretch", "baseline"],
     flexDirection: ["row", "row-reverse", "column", "column-reverse"],
     flexWrap: ["nowrap", "wrap", "wrap-reverse"]
 };
 
-// State variables
-let currentStageIndex = 0;
-let attempts = 0;
-let score = 0;
-let completedStages = JSON.parse(localStorage.getItem('grocery_completed')) || [];
+// Game State
+let currentLevelIdx = 0;
+let userAttempts = 0;
+let totalScore = 0;
+let completedLevels = JSON.parse(localStorage.getItem('market_flex_completed')) || [];
 
-// Initialize game
+function playTone(freq, type, duration) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
+        osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
+}
+
+const sounds = {
+    select: () => playTone(450, 'sine', 0.05),
+    success: () => {
+        playTone(523.25, 'triangle', 0.15);
+        setTimeout(() => playTone(659.25, 'triangle', 0.25), 100);
+    },
+    fail: () => playTone(180, 'sawtooth', 0.25)
+};
+
 document.addEventListener("DOMContentLoaded", () => {
-    loadProgress();
-    renderStageNav();
-    loadStage(currentStageIndex);
+    restoreScore();
+    buildNavigationDots();
+    mountLevel(currentLevelIdx);
 });
 
-// Load stage
-function loadStage(index) {
-    currentStageIndex = index;
-    attempts = 0;
-    const stage = gameLevels[index];
+function mountLevel(index) {
+    currentLevelIdx = index;
+    userAttempts = 0;
+    const level = STAGES_CONFIG[index];
 
-    document.getElementById("stage-title").innerText = stage.title;
-    document.getElementById("stage-instruction").innerText = stage.instruction;
-    document.getElementById("stage-counter").innerText = `שלב ${index + 1} מתוך ${gameLevels.length}`;
-    document.getElementById("attempts-count").innerText = attempts;
+    document.getElementById("stage-title").innerText = level.title;
+    document.getElementById("stage-instruction").innerText = level.instruction;
+    document.getElementById("stage-counter").innerText = `שלב ${index + 1}/${STAGES_CONFIG.length}`;
+    document.getElementById("attempts-count").innerText = userAttempts;
 
-    // Build select controls
-    const controlsContainer = document.getElementById("dynamic-controls");
-    controlsContainer.innerHTML = "";
+    const controlsBox = document.getElementById("dynamic-controls");
+    controlsBox.innerHTML = "";
 
-    stage.controls.forEach(prop => {
-        const group = document.createElement("div");
-        group.className = "control-group";
+    level.controls.forEach(property => {
+        const row = document.createElement("div");
+        row.className = "rule-row";
 
         const label = document.createElement("label");
-        label.innerText = prop + ":";
+        label.innerText = property + ":";
 
         const select = document.createElement("select");
-        select.id = `select-${prop}`;
-        select.dataset.property = prop;
+        select.id = `select-${property}`;
 
-        selectOptions[prop].forEach(val => {
+        FLEX_OPTIONS[property].forEach(val => {
             const opt = document.createElement("option");
             opt.value = val;
-            opt.innerText = val + ";"; // Appends semicolon visually
-            if (val === stage.defaultValues[prop]) opt.selected = true;
+            opt.innerText = `${val};`;
+            if (val === level.defaultValues[property]) opt.selected = true;
             select.appendChild(opt);
         });
 
-        select.addEventListener("change", applyStylesToBoard);
-        group.appendChild(label);
-        group.appendChild(select);
-        controlsContainer.appendChild(group);
+        select.addEventListener("change", () => {
+            sounds.select();
+            updateBoardStyles();
+        });
+
+        row.appendChild(label);
+        row.appendChild(select);
+        controlsBox.appendChild(row);
     });
 
-    renderBoardItems(stage.items);
-    applyStylesToBoard();
-    updateStageNavUI();
+    renderItems(level.items);
+    updateBoardStyles();
+    syncNavUI();
 }
 
-// Create shelf items
-function renderBoardItems(items) {
-    const shelf = document.getElementById("shelf-board");
-    shelf.innerHTML = "";
-    items.forEach(text => {
-        const item = document.createElement("div");
-        item.className = "shelf-item";
-        item.innerText = text;
-        shelf.appendChild(item);
-    });
-}
-
-// Apply selected CSS properties + reset defaults to prevent style leaks between stages
-function applyStylesToBoard() {
-    const shelf = document.getElementById("shelf-board");
-    const stage = gameLevels[currentStageIndex];
-
-    // Explicitly reset all Flexbox properties to CSS default values
-    shelf.style.display = "flex";
-    shelf.style.flexDirection = "row";
-    shelf.style.justifyContent = "flex-start";
-    shelf.style.alignItems = "stretch";
-    shelf.style.flexWrap = "nowrap";
-
-    // Apply current user selections
-    stage.controls.forEach(prop => {
-        const select = document.getElementById(`select-${prop}`);
-        if (select) {
-            shelf.style[prop] = select.value;
-        }
+function renderItems(items) {
+    const board = document.getElementById("pond");
+    board.innerHTML = "";
+    items.forEach(icon => {
+        const div = document.createElement("div");
+        div.className = "shelf-item";
+        div.innerText = icon;
+        board.appendChild(div);
     });
 }
 
-// Solution verification
+function updateBoardStyles() {
+    const board = document.getElementById("pond");
+    const level = STAGES_CONFIG[currentLevelIdx];
+
+    board.style.display = "flex";
+    board.style.flexDirection = "row";
+    board.style.justifyContent = "flex-start";
+    board.style.alignItems = "stretch";
+    board.style.flexWrap = "nowrap";
+
+    level.controls.forEach(prop => {
+        const el = document.getElementById(`select-${prop}`);
+        if (el) board.style[prop] = el.value;
+    });
+}
+
 function checkSolution() {
-    attempts++;
-    document.getElementById("attempts-count").innerText = attempts;
+    userAttempts++;
+    document.getElementById("attempts-count").innerText = userAttempts;
 
-    const stage = gameLevels[currentStageIndex];
-    let isCorrect = true;
-
-    stage.controls.forEach(prop => {
-        const val = document.getElementById(`select-${prop}`).value;
-        if (val !== stage.solution[prop]) {
-            isCorrect = false;
-        }
+    const level = STAGES_CONFIG[currentLevelIdx];
+    const isSolved = level.controls.every(prop => {
+        return document.getElementById(`select-${prop}`).value === level.solution[prop];
     });
 
-    const shelf = document.getElementById("shelf-board");
+    const board = document.getElementById("pond");
 
-    if (isCorrect) {
-        shelf.classList.add("success-glow");
-        setTimeout(() => shelf.classList.remove("success-glow"), 1000);
+    if (isSolved) {
+        sounds.success();
+        board.classList.add("success-glow");
+        setTimeout(() => board.classList.remove("success-glow"), 1000);
 
-        const stageScore = Math.max(100 - (attempts - 1) * 15, 40);
-        score += stageScore;
-        document.getElementById("score-display").innerText = score;
+        const earnedPoints = Math.max(100 - (userAttempts - 1) * 15, 40);
+        totalScore += earnedPoints;
+        document.getElementById("score-display").innerText = totalScore;
 
-        if (!completedStages.includes(currentStageIndex)) {
-            completedStages.push(currentStageIndex);
-            localStorage.setItem('grocery_completed', JSON.stringify(completedStages));
-            localStorage.setItem('grocery_score', score);
+        if (!completedLevels.includes(currentLevelIdx)) {
+            completedLevels.push(currentLevelIdx);
+            localStorage.setItem('market_flex_completed', JSON.stringify(completedLevels));
+            localStorage.setItem('market_flex_score', totalScore);
         }
 
-        alert(`כל הכבוד! סדרת את המדף בהצלחה! 🎉\nצברת ${stageScore} נקודות.`);
+        setTimeout(() => {
+            alert(`כל הכבוד! הסידור מושלם!\nצברת ${earnedPoints} נקודות.`);
+            if (currentLevelIdx + 1 < STAGES_CONFIG.length) {
+                mountLevel(currentLevelIdx + 1);
+            } else {
+                alert("סיימת את כל השלבים בהצטיינות!");
+            }
+        }, 150);
 
-        if (currentStageIndex + 1 < gameLevels.length) {
-            currentStageIndex++;
-            loadStage(currentStageIndex);
-        } else {
-            alert("🏆 ברכות! סיימת את כל השלבים בהצלחה והפכת לסדרן מצטיין!");
-        }
     } else {
-        shelf.classList.add("shake");
-        setTimeout(() => shelf.classList.remove("shake"), 400);
-        alert("הסידור אינו נכון עדיין. נסו לשנות את הערכים ולנסות שוב! ❌");
+        sounds.fail();
+        board.classList.add("shake");
+        setTimeout(() => board.classList.remove("shake"), 350);
     }
 }
 
-// Reset stage to default values
 function resetCurrentStage() {
-    const stage = gameLevels[currentStageIndex];
-    stage.controls.forEach(prop => {
+    const level = STAGES_CONFIG[currentLevelIdx];
+    level.controls.forEach(prop => {
         const select = document.getElementById(`select-${prop}`);
-        if (select) {
-            select.value = stage.defaultValues[prop];
-        }
+        if (select) select.value = level.defaultValues[prop];
     });
-    applyStylesToBoard();
+    updateBoardStyles();
 }
 
-// Load saved progress
-function loadProgress() {
-    const savedScore = localStorage.getItem('grocery_score');
-    if (savedScore) {
-        score = parseInt(savedScore, 10);
-        document.getElementById("score-display").innerText = score;
+function restoreScore() {
+    const saved = localStorage.getItem('market_flex_score');
+    if (saved) {
+        totalScore = parseInt(saved, 10);
+        document.getElementById("score-display").innerText = totalScore;
     }
 }
 
-// Stage navigation
-function renderStageNav() {
+function buildNavigationDots() {
     const nav = document.getElementById("stage-nav");
     nav.innerHTML = "";
-    gameLevels.forEach((_, idx) => {
+    STAGES_CONFIG.forEach((_, idx) => {
         const btn = document.createElement("button");
         btn.className = "stage-btn";
         btn.innerText = idx + 1;
         btn.onclick = () => {
-            if (completedStages.includes(idx) || idx <= completedStages.length) {
-                loadStage(idx);
+            if (completedLevels.includes(idx) || idx <= completedLevels.length) {
+                mountLevel(idx);
             } else {
                 alert("יש להשלים את השלבים הקודמים תחילה!");
             }
@@ -241,11 +248,11 @@ function renderStageNav() {
     });
 }
 
-function updateStageNavUI() {
-    const buttons = document.querySelectorAll(".stage-btn");
-    buttons.forEach((btn, idx) => {
+function syncNavUI() {
+    const btns = document.querySelectorAll(".stage-btn");
+    btns.forEach((btn, idx) => {
         btn.classList.remove("active", "completed");
-        if (idx === currentStageIndex) btn.classList.add("active");
-        if (completedStages.includes(idx)) btn.classList.add("completed");
+        if (idx === currentLevelIdx) btn.classList.add("active");
+        if (completedLevels.includes(idx)) btn.classList.add("completed");
     });
 }
