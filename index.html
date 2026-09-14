@@ -4,50 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סדרן המכולת - משחק Flexbox</title>
+    <title>סדרן המכולת | סדנאות Flexbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Top Bar: Score, progress, and stage navigation -->
-    <header class="header-bar">
-        <div class="stats-container">
-            <span id="stage-counter">שלב 1 מתוך 6</span> |
-            <span>ניקוד: <strong id="score-display">0</strong></span> |
-            <span>ניסיונות: <strong id="attempts-count">0</strong></span>
+    <!-- Top Dashboard Header -->
+    <header class="receipt-header">
+        <div class="stats-group">
+            <div class="stat-tag" id="stage-counter">שלב 1/6</div>
+            <div class="stat-tag highlight">ניקוד: <span id="score-display">0</span></div>
+            <div class="stat-tag">ניסיונות: <span id="attempts-count">0</span></div>
         </div>
-        <div class="stage-nav" id="stage-nav"></div>
+        <nav class="level-selector" id="stage-nav"></nav>
     </header>
 
-    <!-- Main game wrapper -->
-    <main class="game-container">
+    <!-- Main Game Section -->
+    <main class="market-workspace">
 
-        <!-- Control panel and instructions -->
-        <section class="controls-panel">
-            <h2 id="stage-title">טוען שלב...</h2>
-            <p id="stage-instruction">הוראות השלב יופיעו כאן.</p>
+        <!-- Controls Section -->
+        <section class="clipboard-panel">
+            <div class="clipboard-clip"></div>
+            
+            <header class="panel-head">
+                <h2 id="stage-title">טוען שלב...</h2>
+                <p id="stage-instruction">הוראות השלב יופיעו כאן.</p>
+            </header>
 
-            <!-- CSS Code Block showing display: flex indication -->
-            <div class="css-code-block">
-                <span class="code-selector">#shelf-board {</span>
-                <div class="code-line fixed-property">display: flex;</div>
-                <div id="dynamic-controls" class="controls-list">
-                    <!-- Select dropdowns will load dynamically here -->
+            <!-- CSS Terminal Editor -->
+            <div class="terminal-editor">
+                <div class="terminal-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="filename">styles.css</span>
                 </div>
-                <span class="code-selector">}</span>
+                <div class="code-body">
+                    <span class="selector">#pond {</span>
+                    <div class="code-line fixed-rule">display: flex;</div>
+                    <div id="dynamic-controls" class="dynamic-rules"></div>
+                    <span class="selector">}</span>
+                </div>
             </div>
 
-            <div class="btn-group">
-                <button class="btn-check" onclick="checkSolution()">בדוק פתרון ✔️</button>
-                <button class="btn-reset" onclick="resetCurrentStage()">איפוס 🔄</button>
-            </div>
+            <!-- Action Controls -->
+            <footer class="action-bar">
+                <button class="btn btn-submit" onclick="checkSolution()">בדוק סידור</button>
+                <button class="btn btn-reload" onclick="resetCurrentStage()">איפוס</button>
+            </footer>
         </section>
 
-        <!-- Grocery shelf board -->
-        <section class="board-wrapper">
-            <div class="shelf-board" id="shelf-board">
-                <!-- Products will load dynamically here -->
+        <!-- Shelf Display Board -->
+        <section class="board-container">
+            <div class="shelf-frame">
+                <div class="shelf-board" id="pond"></div>
             </div>
         </section>
 
