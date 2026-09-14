@@ -106,7 +106,7 @@ function loadStage(index) {
         selectOptions[prop].forEach(val => {
             const opt = document.createElement("option");
             opt.value = val;
-            opt.innerText = val;
+            opt.innerText = val + ";"; // Appends semicolon visually
             if (val === stage.defaultValues[prop]) opt.selected = true;
             select.appendChild(opt);
         });
