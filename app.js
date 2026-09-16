@@ -64,9 +64,13 @@ const FLEX_OPTIONS = {
 
 // Game State
 let currentLevelIdx = 0;
-let userAttempts = 0;
 let totalScore = 0;
 let completedLevels = JSON.parse(localStorage.getItem('market_flex_completed')) || [];
+
+let attemptsPerLevel = JSON.parse(localStorage.getItem('market_flex_attempts'));
+if (!attemptsPerLevel || attemptsPerLevel.length !== STAGES_CONFIG.length) {
+    attemptsPerLevel = Array(STAGES_CONFIG.length).fill(0);
+}
 
 function playTone(freq, type, duration) {
     try {
@@ -95,18 +99,23 @@ const sounds = {
 document.addEventListener("DOMContentLoaded", () => {
     restoreScore();
     buildNavigationDots();
-    mountLevel(currentLevelIdx);
+    
+    let startLevel = 0;
+    while(completedLevels.includes(startLevel) && startLevel < STAGES_CONFIG.length - 1) {
+        startLevel++;
+    }
+    
+    mountLevel(startLevel);
 });
 
 function mountLevel(index) {
     currentLevelIdx = index;
-    userAttempts = 0;
     const level = STAGES_CONFIG[index];
 
     document.getElementById("stage-title").innerText = level.title;
     document.getElementById("stage-instruction").innerText = level.instruction;
     document.getElementById("stage-counter").innerText = `שלב ${index + 1}/${STAGES_CONFIG.length}`;
-    document.getElementById("attempts-count").innerText = userAttempts;
+    document.getElementById("attempts-count").innerText = attemptsPerLevel[index];
 
     const controlsBox = document.getElementById("dynamic-controls");
     controlsBox.innerHTML = "";
@@ -172,8 +181,9 @@ function updateBoardStyles() {
 }
 
 function checkSolution() {
-    userAttempts++;
-    document.getElementById("attempts-count").innerText = userAttempts;
+    attemptsPerLevel[currentLevelIdx]++;
+    document.getElementById("attempts-count").innerText = attemptsPerLevel[currentLevelIdx];
+    localStorage.setItem('market_flex_attempts', JSON.stringify(attemptsPerLevel));
 
     const level = STAGES_CONFIG[currentLevelIdx];
     const isSolved = level.controls.every(prop => {
@@ -187,21 +197,30 @@ function checkSolution() {
         board.classList.add("success-glow");
         setTimeout(() => board.classList.remove("success-glow"), 1000);
 
-        const earnedPoints = Math.max(100 - (userAttempts - 1) * 15, 40);
-        totalScore += earnedPoints;
-        document.getElementById("score-display").innerText = totalScore;
+        const isFirstTime = !completedLevels.includes(currentLevelIdx);
+        let earnedPoints = 0;
 
-        if (!completedLevels.includes(currentLevelIdx)) {
+        if (isFirstTime) {
+            earnedPoints = Math.max(100 - (attemptsPerLevel[currentLevelIdx] - 1) * 15, 40);
+            totalScore += earnedPoints;
+            document.getElementById("score-display").innerText = totalScore;
+
             completedLevels.push(currentLevelIdx);
             localStorage.setItem('market_flex_completed', JSON.stringify(completedLevels));
             localStorage.setItem('market_flex_score', totalScore);
+            syncNavUI();
         }
 
         setTimeout(() => {
-            alert(`כל הכבוד! הסידור מושלם!\nצברת ${earnedPoints} נקודות.`);
+            if (isFirstTime) {
+                alert(`כל הכבוד! הסידור מושלם!\nצברת ${earnedPoints} נקודות.`);
+            } else {
+                alert(`כל הכבוד! הסידור מושלם!\n(כבר צברת ניקוד על שלב זה בעבר)`);
+            }
+            
             if (currentLevelIdx + 1 < STAGES_CONFIG.length) {
                 mountLevel(currentLevelIdx + 1);
-            } else {
+            } else if (completedLevels.length === STAGES_CONFIG.length) {
                 alert("סיימת את כל השלבים בהצטיינות!");
             }
         }, 150);
@@ -215,11 +234,29 @@ function checkSolution() {
 
 function resetCurrentStage() {
     const level = STAGES_CONFIG[currentLevelIdx];
+    
+    // איפוס הערכים בפקדי ה-Select בלבד לערכי ברירת המחדל
     level.controls.forEach(prop => {
         const select = document.getElementById(`select-${prop}`);
         if (select) select.value = level.defaultValues[prop];
     });
+    
+    // עדכון תצוגת הלוח בהתאם
     updateBoardStyles();
+}
+
+function restartGame() {
+    if(confirm("האם אתה בטוח שברצונך לאפס את כל המשחק ואת הניקוד?")) {
+        localStorage.removeItem('market_flex_completed');
+        localStorage.removeItem('market_flex_score');
+        localStorage.removeItem('market_flex_attempts');
+        completedLevels = [];
+        totalScore = 0;
+        attemptsPerLevel = Array(STAGES_CONFIG.length).fill(0);
+        document.getElementById("score-display").innerText = totalScore;
+        buildNavigationDots();
+        mountLevel(0);
+    }
 }
 
 function restoreScore() {
